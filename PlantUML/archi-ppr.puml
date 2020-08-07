@@ -1,0 +1,103 @@
+@startuml
+
+	skinparam defaultTextAlignment center
+
+	!define ICONURL https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/v2.1.0
+	!define SPRITESURL https://raw.githubusercontent.com/rabelenda/cicon-plantuml-sprites/v1.0/sprites
+  !define CLOUDOGUURL https://raw.githubusercontent.com/cloudogu/plantuml-cloudogu-sprites/master    
+
+	!includeurl ICONURL/devicons/postgresql.puml 
+	!includeurl ICONURL/devicons/database.puml 
+	!includeurl ICONURL/devicons/firefox.puml
+	!includeurl ICONURL/devicons/redis.puml
+	!includeurl ICONURL/devicons/aws.puml
+  !includeurl ICONURL/dev2/apache.puml
+	!include <office/Devices/load_balancer>
+
+	!include <tupadr3/common>
+	!include <tupadr3/font-awesome-5/server>
+	!include <tupadr3/font-awesome-5/user>
+	!include <tupadr3/font-awesome-5/folder_open>
+	!include <tupadr3/font-awesome-5/whmcs>
+	!include <tupadr3/font-awesome/sitemap>
+	!include <tupadr3/font-awesome/user_circle>
+
+	!include <aws/common>
+	!include <aws/Storage/AmazonS3/AmazonS3>
+	!include <aws/Storage/AmazonS3/bucket/bucket>
+
+
+  !includeurl ICONURL/dev2/go.puml
+    !includeurl ICONURL/devicons/python.puml
+    !includeurl CLOUDOGUURL/tools/grafana.puml
+
+
+	FA_USER_CIRCLE(user,**Utilisateurs**) #white
+	DEV_FIREFOX(firefox,**https://NextCloud-ppr.fr**,rectangle) #white
+	OFF_LOAD_BALANCER(ns, "**\tNetScaler\t\t**")#white
+
+	FA5_SERVER(NFS,"**Montage NFS**\n**Stockage S3**",rectangle,black)#White
+
+	FA5_SERVER(Z33,Z33 PRD\nParisBox\n){
+
+    rectangle "Serveurs Web" as htp{
+      
+	  	rectangle "Serveurs Web 01" as htp01#lightgreen{
+		  	DEV2_APACHE(apache01,**Apache**) #white
+	  	}
+	  	rectangle "Serveurs Web 02" as htp02 #lightgreen{
+		  	DEV2_APACHE(apache02,**Apache**) #white
+	  	}
+	  	rectangle "Serveurs Web 03" as htp03 #lightgreen{
+	  		DEV2_APACHE(apache03,**Apache**) #white
+	  	}
+	  	rectangle "Serveurs Web 04" as htp04#lightgreen{
+	  		DEV2_APACHE(apache04,**Apache**) #white
+	  	}
+    }
+    rectangle "Serveurs de base de données" as sql {
+		
+	  	rectangle " Serveu PSQ01" as psq01 #lightgreen {
+			  DEV_POSTGRESQL(postgres01,Postgres\n**Primary**,database,white) #DodgerBlue
+	  	}
+       rectangle " Serveu PSQ02" as psq02 #lightgreen {
+		  	DEV_POSTGRESQL(postgres02,Postgres\n**StandBy**,database,white)#DodgerBlue
+	  	}
+    }
+
+    rectangle "Serveurs de cache" as redis{
+      rectangle " Serveu Redis01" as redis1 #lightgreen {
+			  DEV_REDIS(redis01,**Redis**\n**Primary**,rectangle,Red)#white
+		  }
+      
+      rectangle " Serveu Redis02" as redis2 #lightgreen {
+		    DEV_REDIS(redis02,**Redis**\n**StandBy**,rectangle,Red)#white
+		  }
+    }
+		
+	}
+
+
+		user=>firefox #Black
+
+		firefox=>ns #Black : https 
+
+		ns=down=>apache01 #Black : https
+		ns=down=>apache02 #Black : https
+		ns=down=>apache03 #Black : https
+		ns=down=>apache04 #Black : https
+
+  skinparam defaultTextAlignment center
+  htp=down=>postgres01 : R/W
+  htp=down=>redis01
+  htp=left=>NFS
+  htp .down.> postgres02 :RO
+
+  redis01=up=>postgres02
+  redis02=up=>postgres01 
+
+  postgres01=right=>postgres02 : réplication
+  redis01=left=>redis02 : réplication
+
+
+@enduml

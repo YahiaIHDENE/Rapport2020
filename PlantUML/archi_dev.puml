@@ -1,0 +1,60 @@
+@startuml
+
+skinparam defaultTextAlignment center
+    
+!define ICONURL https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/v2.1.0
+!define SPRITESURL https://raw.githubusercontent.com/rabelenda/cicon-plantuml-sprites/v1.0/sprites
+
+!includeurl ICONURL/devicons/postgresql.puml 
+!includeurl ICONURL/devicons/database.puml 
+!includeurl ICONURL/devicons/firefox.puml
+!includeurl ICONURL/devicons/redis.puml
+!includeurl ICONURL/dev2/apache.puml
+!includeurl ICONURL/font-awesome-5/database.puml
+
+!include <office/Devices/load_balancer>
+
+!include <tupadr3/common>
+!include <tupadr3/font-awesome-5/server>
+!include <tupadr3/font-awesome-5/user>
+!include <tupadr3/font-awesome-5/folder_open>
+!include <tupadr3/font-awesome-5/whmcs>
+!include <tupadr3/font-awesome/sitemap>
+!include <tupadr3/font-awesome/user_circle>
+
+!include <aws/common>
+!include <aws/Storage/AmazonS3/AmazonS3>
+!include <aws/Storage/AmazonS3/bucket/bucket>
+
+FA_USER_CIRCLE(user,**Utilisateurs**) #white
+DEV_FIREFOX(firefox,**NextCloud-dev.fr**,rectangle )#white
+
+
+OFF_LOAD_BALANCER(ns, "NetScaler")#white
+
+
+FA5_SERVER(Z33,NextCloud\nParisTransfert\n){
+
+
+    rectangle "\nServeur web\n" as htp01 #lightgreen{
+		  DEV2_APACHE(apache01,**Apache**) #white
+      FA5_DATABASE(stockage,**stockage**,database,white)#blue
+    }
+ 
+  rectangle "\nServeur PSQ01\n" as psq01 #lightgreen{
+		DEV_POSTGRESQL(postgres01,**PostgreSQL**,database,white)#DodgerBlue
+	}
+
+}
+user=>firefox
+
+firefox=>ns : https 
+
+ns=down=>apache01 : https 
+apache01=>stockage
+
+
+apache01=right=>postgres01 : **read-write**
+
+
+@enduml
